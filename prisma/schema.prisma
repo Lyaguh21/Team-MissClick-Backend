@@ -14,11 +14,13 @@ datasource db {
 }
 
 model User {
-  id Int @id
-  login String
+  id Int @id @default(autoincrement())
+  login String @unique  
   name String
   password String
-  role String @default("user")
+  roles Role[]
+  createdAt DateTime @default (now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model Task{
@@ -26,5 +28,9 @@ model Task{
   name String
   description String
   
+}
 
+enum Role{
+  ADMIN
+  USER
 }
