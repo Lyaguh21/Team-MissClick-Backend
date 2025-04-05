@@ -1,8 +1,6 @@
 import { Article } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
-import { title } from 'process';
-import { create } from 'domain';
 import { CreateArticleDto } from './dto/create.dto';
 
 @Injectable()
@@ -22,6 +20,7 @@ export class ArticleService {
             },
         });
         return article.map( article => ({
+            id: article.id,
             title: article.title,
             createdAt: article.createdAt,
             author: article.lastEditor.name,
