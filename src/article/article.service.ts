@@ -2,6 +2,7 @@ import { Article } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { CreateArticleDto } from './dto/create.dto';
+import { UpdateDto } from './dto/updated.dto';
 
 @Injectable()
 export class ArticleService {
@@ -25,13 +26,17 @@ export class ArticleService {
     return article.map((article) => ({
       id: article.id,
       title: article.title,
+      content: article.content,
       createdAt: article.createdAt,
       author: article.lastEditor.name,
       image: article.images,
     }));
   }
 
-  async createArticle(dto: CreateArticleDto, regUser: { userId: number; login: string }) {
+  async createArticle(
+    dto: CreateArticleDto,
+    regUser: { userId: number; login: string },
+  ) {
     const article = await this.prismaService.article.create({
       data: {
         title: dto.title,
@@ -42,14 +47,40 @@ export class ArticleService {
         },
       },
     });
-  
+
     return {
       id: article.id,
       title: article.title,
       createdAt: article.createdAt,
       editorName: regUser.login,
       image: article.images[0] ?? null,
+    };
   }
 
-  //   async update(dto: )
-}}
+  deleteArcticle(articleId: number) {
+    return this.prismaService.article.update({
+      
+      where: { id: articleId },
+      data: { deleted: true },
+    });
+  }
+
+  async updateArticle(dto: UpdateDto, regUser: { userId: number; login: string }) {
+    const data: any = {};
+  
+    if (dto.title !== undefined) data.title = dto.title;
+    if (dto.content !== undefined) data.content = dto.content;
+    if (dto.image !== undefined) data.images = dto.image;
+
+    data.lastEditor = {
+      connect: { id: regUser.userId },
+    };
+  
+    return this.prismaService.article.update({
+      where: {
+        id: Number(dto.id),
+      },
+      data,
+    });
+  }
+}

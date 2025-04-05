@@ -55,7 +55,6 @@ export class UsersService {
       login: users.login,
       name: users.name,
       role: users.roles,
-      password: users.password,
       createdAt: users.createdAt,
     }));
   }

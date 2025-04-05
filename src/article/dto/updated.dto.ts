@@ -1,5 +1,6 @@
 export class UpdateDto{
+    id: number;
     title?: string;
-    context?: string;
+    content?: string;
     image?: string;   
 }
