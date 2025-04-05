@@ -11,11 +11,11 @@ import {
 import { UsersService } from './users.service';
 import { FindAllDto } from './dto/findAll.dto';
 
-@Controller('')
+@Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post(":createUser")
   createUser(@Body() dto) {
     return this.usersService.save(dto);
   }

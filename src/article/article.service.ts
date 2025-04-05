@@ -31,27 +31,25 @@ export class ArticleService {
     }));
   }
 
-  async createArticle(dto: CreateArticleDto, userId: number) {
+  async createArticle(dto: CreateArticleDto, regUser: { userId: number; login: string }) {
     const article = await this.prismaService.article.create({
       data: {
         title: dto.title,
         content: dto.content ?? '',
         images: dto.images ?? [],
-        lastEditorId: userId,
-      },
-      include: {
-        lastEditor: true,
+        lastEditor: {
+          connect: { id: regUser.userId },
+        },
       },
     });
-
+  
     return {
       id: article.id,
       title: article.title,
       createdAt: article.createdAt,
-      editorName: article.lastEditor.name,
+      editorName: regUser.login,
       image: article.images[0] ?? null,
-    };
   }
 
-//   async update(dto: )
-}
+  //   async update(dto: )
+}}
