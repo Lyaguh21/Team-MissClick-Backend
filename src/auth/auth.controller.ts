@@ -5,22 +5,19 @@ import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService){}
-    @Post('register')
-    async register(@Body() dto: registerDto) {
-        var localRegister = await this.authService.register(dto)
-        return {
-            id: localRegister.id,
-            login: localRegister.login,
-            name: localRegister.name,
-            
-        }
+  constructor(private readonly authService: AuthService) {}
+  @Post('register')
+  async register(@Body() dto: registerDto) {
+    var localRegister = await this.authService.register(dto);
+    return {
+      id: localRegister.id,
+      login: localRegister.login,
+      name: localRegister.name,
+    };
+  }
 
-    }
-
-    @Post("login")
-    login(@Body() dto: loginDto) {
-        console.log(dto)
-        return this.authService.login(dto)
-    }
+  @Post("login")
+  login(@Body() dto: loginDto) {
+      return this.authService.login(dto)
+  }
 }

@@ -21,6 +21,7 @@ export class AuthService {
       throw new UnauthorizedException('Неверный логин или пароль');
     }
     const payload = { sub: user.id, login: user.login };
-    return { access_token: this.jwtService.sign(payload) };
+    const token = this.jwtService.sign(payload);
+    return { access_token: token };
   }
 }
