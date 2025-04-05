@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { CreateArticleDto } from './dto/create.dto';
 import { UpdateDto } from './dto/updated.dto';
+import { last } from 'rxjs';
 
 @Injectable()
 export class ArticleService {
@@ -10,7 +11,8 @@ export class ArticleService {
 
   async viewAll(
     sortBy: 'createdAt' | 'title' = 'createdAt',
-    order: 'asc' | 'desc' = 'desc',
+    order: 'asc' | 'desc' = 'desc', 
+    regUser: { userId: number; login: string } 
   ) {
     const article = await this.prismaService.article.findMany({
       where: {
@@ -28,7 +30,7 @@ export class ArticleService {
       title: article.title,
       content: article.content,
       createdAt: article.createdAt,
-      author: article.lastEditor.name,
+      authorlogin: regUser.login,
       image: article.images,
     }));
   }
@@ -52,7 +54,7 @@ export class ArticleService {
       id: article.id,
       title: article.title,
       createdAt: article.createdAt,
-      editorName: regUser.login,
+      lastEditorLogin: regUser.login,
       image: article.images[0] ?? null,
     };
   }

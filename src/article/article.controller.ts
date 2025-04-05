@@ -19,12 +19,14 @@ import { UpdateDto } from './dto/updated.dto';
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/viewAll')
   async viewAll(
+    @Request() req,
     @Query('sortBy') sortBy?: 'createdAt' | 'title',
     @Query('order') order?: 'asc' | 'desc',
-  ) {   
-    return this.articleService.viewAll(sortBy, order);
+    ) {   
+    return this.articleService.viewAll(sortBy, order, req);
   }
 
   @UseGuards(AuthGuard('jwt'))
