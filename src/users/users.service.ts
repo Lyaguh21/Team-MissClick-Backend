@@ -37,6 +37,17 @@ export class UsersService {
         });
     }
 
+    async findAll(){
+        const users = await this.prismaService.user.findMany({
+            where:{
+                deleted: false,
+            },
+            orderBy:{
+                id: 'asc',
+            }
+        })
+    }
+
     delete(id: number) {
         return this.prismaService.user.delete({
             where:{ id }

@@ -1,5 +1,5 @@
 export class UpdateDto{
-    title: string;
-    context: string;
-    
+    title?: string;
+    context?: string;
+    image?: string;   
 }

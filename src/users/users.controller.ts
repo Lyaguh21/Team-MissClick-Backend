@@ -23,6 +23,7 @@ export class UsersController {
   findOneUser(@Param('Login') Login: string) {
     return this.usersService.findOne(Login);
   }
+//   Все Данных
 
   @Delete(':id')
   deleteUser(@Param('id', ParseUUIDPipe) id: number) {
