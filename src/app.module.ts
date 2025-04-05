@@ -12,6 +12,7 @@ import { ArticleModule } from './article/article.module';
 import { ArticleController } from './article/article.controller';
 import { AuthController } from './auth/auth.controller';
 
+
 @Module({
 imports: [PrismaModule, UsersModule, AuthModule, ConfigModule.forRoot({ isGlobal: true}), TasksModule, ArticleModule],
   controllers: [AppController, TasksController, ArticleController, AuthController],

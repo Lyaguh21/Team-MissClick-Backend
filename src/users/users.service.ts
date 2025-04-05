@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -9,15 +9,24 @@ export class UsersService {
     constructor(private readonly prismaService: PrismaService){}
 
     async save(user: registerDto) {
+        const existingUser = await this.prismaService.user.findUnique({
+            where: { login: user.login },
+        });
+    
+        if (existingUser) {
+            throw new ConflictException('Пользователь с таким логином уже существует');
+        }
+    
         const hashPassword = await this.hashPassword(user.password);
+    
         return this.prismaService.user.create({
             data: {
                 login: user.login,
                 password: hashPassword,
-                name: user.name, 
+                name: user.name,
                 roles: ['USER'],
             },
-        }); 
+        });
     }
 
     findOne(Login: string) {

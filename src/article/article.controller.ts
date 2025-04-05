@@ -1,20 +1,23 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ArticleService } from './article.service';
+import { CreateArticleDto } from './dto/create.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  @Get("")
+  @Get("/viewAll")
   async viewAll(
     @Query('sortBy') sortBy?: 'createdAt' | 'title',
     @Query('order') order?: 'asc' | 'desc',
   ) {
     return this.articleService.viewAll(sortBy,order);
   }
-
-  @Post("")
-  async createArticle(@Body() dto){
-    return this.articleService.createArticle(dto)
+  
+  @UseGuards(AuthGuard('jwt'))
+  @Post("/create")
+  async createArticle(@Body() dto: CreateArticleDto, userId: number){
+    return this.articleService.createArticle(dto, userId)
   }
 }
