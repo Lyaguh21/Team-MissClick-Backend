@@ -18,9 +18,11 @@ model User {
   login String @unique  
   name String
   password String
-  roles Role[]
   createdAt DateTime @default (now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  Token Token[]
+  roles Role[]
+  @@map("users")
 }
 
 model Task{ 
@@ -30,7 +32,15 @@ model Task{
   
 }
 
+model Token{
+  token String @unique  
+  exp DateTime
+  user User    @relation(fields: [userId], references: [id])
+  userId Int
+}
+
 enum Role{
   ADMIN
   USER
 }
+
