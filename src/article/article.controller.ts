@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards, Request } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,7 +17,7 @@ export class ArticleController {
   
   @UseGuards(AuthGuard('jwt'))
   @Post("/create")
-  async createArticle(@Body() dto: CreateArticleDto, userId: number){
-    return this.articleService.createArticle(dto, userId)
+  async createArticle(@Body() dto: CreateArticleDto, @Request() req){
+    return this.articleService.createArticle(dto, req.user.Login)
   }
 }
