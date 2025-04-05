@@ -92,7 +92,7 @@ model Article {
   updatedAt         DateTime @updatedAt
   lastEditor        User     @relation("ArticleEditor", fields: [lastEditorId], references: [id])
   lastEditorId      Int
-  lastEditorLogin   String  
+  lastEditorLogin   String?  
   changes           ArticleChange[]
   deleted           Boolean  @default(false)
 }

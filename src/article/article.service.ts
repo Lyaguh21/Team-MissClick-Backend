@@ -11,7 +11,7 @@ export class ArticleService {
   async viewAll(
     sortBy: 'createdAt' | 'title' = 'createdAt',
     order: 'asc' | 'desc' = 'desc',
-    regUser: { userId: number; login: string }
+    regUser: { userId: number; login: string },
   ) {
     const article = await this.prismaService.article.findMany({
       where: {
@@ -24,12 +24,13 @@ export class ArticleService {
         [sortBy]: order,
       },
     });
+    console.log(regUser.login)
     return article.map((article) => ({
       id: article.id,
       title: article.title,
       content: article.content,
       createdAt: article.createdAt,
-      author: article.lastEditor,
+      lastEditor: article.lastEditor.login ?? "анонимус",
 
       image: article.images,
     }));
@@ -49,7 +50,6 @@ export class ArticleService {
         },
       },
     });
-    console.log(regUser.login)
     return {
       id: article.id,
       title: article.title,
@@ -61,15 +61,17 @@ export class ArticleService {
 
   deleteArcticle(articleId: number) {
     return this.prismaService.article.update({
-      
       where: { id: articleId },
       data: { deleted: true },
     });
   }
 
-  async updateArticle(dto: UpdateDto, regUser: { userId: number; login: string }) {
+  async updateArticle(
+    dto: UpdateDto,
+    regUser: { userId: number; login: string },
+  ) {
     const data: any = {};
-  
+
     if (dto.title !== undefined) data.title = dto.title;
     if (dto.content !== undefined) data.content = dto.content;
     if (dto.image !== undefined) data.images = dto.image;
@@ -77,7 +79,7 @@ export class ArticleService {
     data.lastEditor = {
       connect: { id: regUser.userId },
     };
-  
+
     return this.prismaService.article.update({
       where: {
         id: Number(dto.id),
