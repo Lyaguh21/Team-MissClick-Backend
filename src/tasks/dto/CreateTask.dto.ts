@@ -1,6 +1,6 @@
 export class CreateTaskDto {
   title: string;
-  description: string;
+  content: string;
   images: string[];
   priority: 'LOW' | 'MEDIUM' | 'HIGH';
   status?: string;
