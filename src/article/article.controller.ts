@@ -3,47 +3,50 @@ import {
   Controller,
   Get,
   Post,
-  Query,
+  Patch,
   UseGuards,
   Request,
-  Patch,
-  Param,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { UpdateDto } from './dto/updated.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/viewAll')
+  @Post('/viewAll')
   async viewAll(
     @Request() req,
-    @Query('sortBy') sortBy?: 'createdAt' | 'title',
-    @Query('order') order?: 'asc' | 'desc',
-    ) {   
-    return this.articleService.viewAll(sortBy, order, req);
+    @Body('sortBy') sortBy?: 'createdAt' | 'title',
+    @Body('order') order?: 'asc' | 'desc',
+  ) {
+    return this.articleService.viewAll(sortBy, order, req.user);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/create')
   async createArticle(@Body() dto: CreateArticleDto, @Request() req) {
-
     return this.articleService.createArticle(dto, req.user);
   }
 
-  @Patch("/delete")
-  deleteArticle(@Body("id", ParseIntPipe) arcticleId: number ){
-    return this.articleService.deleteArcticle(arcticleId)
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/delete')
+  async deleteArticle(@Body('id') articleId: number, @Request() req) {
+    return this.articleService.deleteArcticle(articleId, req.user);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch("/update")
-   async updateArticle(@Body() dto: UpdateDto, @Request() req) {
+  @Post('/history')
+  async getArticleHistory(@Body('id') id: number) {
+    return this.articleService.getArticleHistory(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/update')
+  async updateArticle(@Body() dto: UpdateDto, @Request() req) {
     return this.articleService.updateArticle(dto, req.user);
-   }
+  }
 }

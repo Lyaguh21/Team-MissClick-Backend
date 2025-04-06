@@ -1,4 +1,4 @@
-import { Article } from '@prisma/client';
+import { Article, ChangeEvent } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { CreateArticleDto } from './dto/create.dto';
@@ -6,32 +6,26 @@ import { UpdateDto } from './dto/updated.dto';
 
 @Injectable()
 export class ArticleService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async viewAll(
     sortBy: 'createdAt' | 'title' = 'createdAt',
     order: 'asc' | 'desc' = 'desc',
     regUser: { userId: number; login: string },
   ) {
-    const article = await this.prismaService.article.findMany({
-      where: {
-        deleted: false,
-      },
-      include: {
-        lastEditor: true,
-      },
-      orderBy: {
-        [sortBy]: order,
-      },
+    const articles = await this.prisma.article.findMany({
+      where: { deleted: false },
+      include: { lastEditor: true },
+      orderBy: { [sortBy]: order },
     });
-    return article.map((article) => ({
+
+    return articles.map((article) => ({
       id: article.id,
       title: article.title,
-      content: article.content,
+      description: article.content,
       createdAt: article.createdAt,
-      lastEditor: article.lastEditor.login ?? "анонимус",
-
-      image: article.images,
+      lastEditor: article.lastEditor?.login ?? 'анонимус',
+      image: article.images[0] ?? null,
     }));
   }
 
@@ -39,16 +33,24 @@ export class ArticleService {
     dto: CreateArticleDto,
     regUser: { userId: number; login: string },
   ) {
-    const article = await this.prismaService.article.create({
+    const article = await this.prisma.article.create({
       data: {
         title: dto.title,
         content: dto.content ?? '',
         images: dto.images ?? [],
-        lastEditor: {
-          connect: { id: regUser.userId },
-        },
+        lastEditor: { connect: { id: regUser.userId } },
       },
     });
+
+    // Журналируем создание
+    await this.prisma.articleChange.create({
+      data: {
+        articleId: article.id,
+        userId: regUser.userId,
+        event: 'CREATED',
+      },
+    });
+
     return {
       id: article.id,
       title: article.title,
@@ -58,11 +60,22 @@ export class ArticleService {
     };
   }
 
-  deleteArcticle(articleId: number) {
-    return this.prismaService.article.update({
+  async deleteArcticle(articleId: number, regUser: { userId: number }) {
+    const article = await this.prisma.article.update({
       where: { id: articleId },
       data: { deleted: true },
     });
+
+    // Журналируем удаление
+    await this.prisma.articleChange.create({
+      data: {
+        articleId: article.id,
+        userId: regUser.userId,
+        event: 'DELETED',
+      },
+    });
+
+    return article;
   }
 
   async updateArticle(
@@ -79,11 +92,33 @@ export class ArticleService {
       connect: { id: regUser.userId },
     };
 
-    return this.prismaService.article.update({
-      where: {
-        id: Number(dto.id),
-      },
+    const updatedArticle = await this.prisma.article.update({
+      where: { id: Number(dto.id) },
       data,
+    });
+
+    // Журналируем обновление
+    await this.prisma.articleChange.create({
+      data: {
+        articleId: updatedArticle.id,
+        userId: regUser.userId,
+        event: 'UPDATED',
+      },
+    });
+
+    return updatedArticle;
+  }
+
+  async getArticleHistory(articleId: number) {
+    return this.prisma.articleChange.findMany({
+      where: { articleId },
+      include: {
+        user: true,
+        article: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
     });
   }
 }

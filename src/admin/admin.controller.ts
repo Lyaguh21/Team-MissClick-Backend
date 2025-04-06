@@ -13,13 +13,13 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   // Получение пользователей (с фильтрами)
-  @Post('users/find')
+  @Post('/find')
   getAllUsers(@Body() filters: any) {
     return this.adminService.findAll(filters);
   }
 
   // Обновление данных пользователя
-  @Post('users/update')
+  @Post('/update')
   updateUser(
     @Body()
     body: {
@@ -34,19 +34,19 @@ export class AdminController {
   }
 
   // Мягкое удаление пользователя
-  @Post('users/delete')
+  @Post('/delete')
   deleteUser(@Body() body: { id: number }) {
     return this.adminService.softDelete(body.id);
   }
 
   // Смена пароля
-  @Post('users/change-password')
+  @Post('/change-password')
   changePassword(@Body() body: { id: number; newPassword: string }) {
     return this.adminService.changePassword(body.id, body.newPassword);
   }
 
   // Назначение ролей
-  @Post('users/set-roles')
+  @Post('/set-roles')
   assignRoles(@Body() body: { id: number; roles: string[] }) {
     return this.adminService.assignRoles(body.id, body.roles);
   }

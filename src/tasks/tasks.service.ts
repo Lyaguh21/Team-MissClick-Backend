@@ -19,7 +19,7 @@ export class TasksService {
     const task = await this.prismaService.task.create({
       data: {
         title: dto.title,
-        description: dto.description,
+        description: dto.content,
         images: dto.images,
         plannedDate: dto.plannedDate,
         priority: dto.priority,
