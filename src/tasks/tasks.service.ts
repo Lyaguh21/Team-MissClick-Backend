@@ -20,22 +20,23 @@ export class TasksService {
       data: {
         title: dto.title,
         description: dto.content,
-        images: dto.images,
-        plannedDate: dto.plannedDate,
-        priority: dto.priority,
+        images: dto.images ?? [],
+        plannedDate: dto.plannedDate ? new Date(dto.plannedDate) : new Date(), // защита от null
+        priority: dto.priority ?? 'MEDIUM', // по умолчанию, если не передано
         assignedToId: regUser.userId,
         createdById: regUser.userId,
       },
     });
-
+  
     return {
       id: task.id,
       title: task.title,
       createdAt: task.createdAt,
       lastEditor: regUser.login,
-      image: task.images[0] ?? null,
+      image: task.images?.[0] ?? null,
     };
   }
+  
 
   async updateTask(
     regUser: { userId: number; login: string },
