@@ -52,13 +52,7 @@ export class UsersService {
         id: 'asc',
       },
     });
-    return [users.map((users) => ({
-      id: users.id,
-      login: users.login,
-      name: users.name,
-      role: users.roles,
-      createdAt: users.createdAt,
-    }))];
+    return users
   }
 
   delete(id: number) {
