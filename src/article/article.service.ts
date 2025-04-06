@@ -113,16 +113,39 @@ export class ArticleService {
     return updatedArticle;
   }
 
-  async getArticleHistory(articleId: number) {
-    return this.prismaService.articleChange.findMany({
-      where: { articleId },
-      include: {
-        user: true,
-        article: true,
+  async getArticleHistory() {
+    const changes = await this.prismaService.articleChange.findMany({
+      where: {
+        article: {
+          deleted: false,
+        },
+      },
+      select: {
+        id: true,
+        date: true,
+        event: true,
+        user: {
+          select: {
+            login: true,
+          },
+        },
+        article: {
+          select: {
+            title: true,
+          },
+        },
       },
       orderBy: {
         date: 'desc',
       },
     });
+    return changes.map(change => ({
+      id: change.id,
+      article: change.article.title,
+      user: change.user.login,
+      event: change.event,
+      date: change.date,
+    }));
   }
+  
 }

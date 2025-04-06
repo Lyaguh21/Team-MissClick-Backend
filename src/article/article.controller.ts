@@ -47,9 +47,8 @@ export class ArticleController {
     return this.articleService.updateArticle(dto, req.user);
    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Get('/history')
-   async getArticleHistory(@Body('id', ParseIntPipe) id: number) {
-     return this.articleService.getArticleHistory(id);
+   @Get('/audit')
+   async getArticleHistory() {
+     return this.articleService.getArticleHistory();
    }
 }
