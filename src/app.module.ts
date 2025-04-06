@@ -11,11 +11,13 @@ import { ArticleService } from './article/article.service';
 import { ArticleModule } from './article/article.module';
 import { ArticleController } from './article/article.controller';
 import { AuthController } from './auth/auth.controller';
+import { AdminController } from './admin/admin.controller';
+import { AdminModule } from './admin/admin.module';
 
 
 @Module({
-imports: [PrismaModule, UsersModule, AuthModule, ConfigModule.forRoot({ isGlobal: true}), TasksModule, ArticleModule],
-  controllers: [AppController, TasksController, ArticleController, AuthController],
+imports: [PrismaModule, UsersModule, AuthModule, ConfigModule.forRoot({ isGlobal: true}), TasksModule, ArticleModule, AdminModule],
+  controllers: [AppController, TasksController, ArticleController, AuthController, AdminController],
   providers: [AppService, ArticleService],
 })
 export class AppModule {}
