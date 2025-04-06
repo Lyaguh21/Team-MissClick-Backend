@@ -30,8 +30,18 @@ export class UsersController {
     return this.usersService.delete(id);
   }
 
-  @Get(':toAll')
-  findAllUsers(@Param() dto: FindAllDto){
-    return this.usersService.findAll(dto)
+  @Get("/toAll")
+  findAllUsers(){
+    return this.usersService.findAll()
+  }
+
+  @Get("/token")
+  async getUserFromToken(@Body() token: string){
+    const data = await this.usersService.getUserFromToken(token)
+    return {
+      id: data.id,
+      login: data.login,
+      name: data.name
+    }
   }
 }

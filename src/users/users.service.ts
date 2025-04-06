@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -8,6 +8,8 @@ import { FindAllDto } from './dto/findAll.dto';
 
 @Injectable()
 export class UsersService {
+  jwtService: any;
+  prisma: any;
   constructor(private readonly prismaService: PrismaService) {}
 
   async save(user: registerDto) {
@@ -41,7 +43,7 @@ export class UsersService {
     });
   }
 
-  async findAll(dto: FindAllDto) {
+  async findAll() {
     const users = await this.prismaService.user.findMany({
       where: {
         deleted: false,
@@ -73,4 +75,29 @@ export class UsersService {
   async validatePassword(password: string, hash: string) {
     return bcrypt.compare(password, hash);
   }
-}
+
+  async getUserFromToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.id },
+        select: {
+          id: true,
+          login: true,
+          name: true,
+          roles: true,
+        },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('Пользователь не найден');
+      }
+
+      return user;
+    } catch (err) {
+      throw new UnauthorizedException('Невалидный токен');
+    }
+}}

@@ -12,13 +12,11 @@ import { AuthGuard } from '@nestjs/passport';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  // Получение пользователей (с фильтрами)
   @Post('/find')
   getAllUsers(@Body() filters: any) {
     return this.adminService.findAll(filters);
   }
 
-  // Обновление данных пользователя
   @Post('/update')
   updateUser(
     @Body()
@@ -33,13 +31,12 @@ export class AdminController {
     return this.adminService.update(id, dto);
   }
 
-  // Мягкое удаление пользователя
+  
   @Post('/delete')
   deleteUser(@Body() body: { id: number }) {
     return this.adminService.softDelete(body.id);
   }
 
-  // Смена пароля
   @Post('/change-password')
   changePassword(@Body() body: { id: number; newPassword: string }) {
     return this.adminService.changePassword(body.id, body.newPassword);
