@@ -24,7 +24,6 @@ export class ArticleService {
         [sortBy]: order,
       },
     });
-    console.log(regUser.login)
     return article.map((article) => ({
       id: article.id,
       title: article.title,
