@@ -40,16 +40,21 @@ export class TasksService {
 
   async updateTask(
     regUser: { userId: number; login: string },
-    data: UpdateDto,
+    dto: UpdateDto,
   ) {
     const task = await this.prismaService.task.update({
-      where: { id: data.id },
-      data,
-    });
+        where: { id: dto.id },
+        data: {
+          title: dto.title,
+          description: dto.content,
+          plannedDate: dto.plannedDate ? new Date(dto.plannedDate) : undefined,
+          images: dto.images ?? [],
+        },
+      });
 
     await this.prismaService.taskChange.create({
       data: {
-        taskId: data.id,
+        taskId: dto.id,
         userId: regUser.userId,
         event: 'UPDATED',
       },
