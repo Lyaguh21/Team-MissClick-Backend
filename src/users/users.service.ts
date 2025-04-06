@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -51,8 +55,16 @@ export class UsersService {
       orderBy: {
         id: 'asc',
       },
+      select: {
+        id: true,
+        login: true,
+        name: true,
+        roles: true,
+        createdAt: true,
+      },
     });
-    return users
+  
+    return users;
   }
 
   delete(id: number) {
@@ -76,7 +88,7 @@ export class UsersService {
         secret: process.env.JWT_SECRET,
       });
 
-      const user = await this.prisma.user.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: { id: payload.id },
         select: {
           id: true,
@@ -94,4 +106,5 @@ export class UsersService {
     } catch (err) {
       throw new UnauthorizedException('Невалидный токен');
     }
-}}
+  }
+}

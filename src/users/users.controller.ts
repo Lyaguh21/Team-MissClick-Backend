@@ -15,23 +15,23 @@ import { FindAllDto } from './dto/findAll.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post(":createUser")
+  @Post("/createUser")
   createUser(@Body() dto) {
     return this.usersService.save(dto);
   }
 
-  @Get(':toLogin')
+  @Get('/toLogin')
   findOneUser(@Param('Login') Login: string) {
     return this.usersService.findOne(Login);
   }
 
-  @Delete(':id')
+  @Delete('/id')
   deleteUser(@Param('id', ParseUUIDPipe) id: number) {
     return this.usersService.delete(id);
   }
 
   @Get("/toAll")
-  findAllUsers(){
+  async findAllUsers(){
     return this.usersService.findAll()
   }
 
