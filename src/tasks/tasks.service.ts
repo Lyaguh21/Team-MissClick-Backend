@@ -37,7 +37,10 @@ export class TasksService {
     };
   }
 
-  async updateTask(regUser: { userId: number; login: string }, data: UpdateDto) {
+  async updateTask(
+    regUser: { userId: number; login: string },
+    data: UpdateDto,
+  ) {
     const task = await this.prismaService.task.update({
       where: { id: data.id },
       data,
@@ -54,75 +57,93 @@ export class TasksService {
     return task;
   }
 
-    async deleteTask(taskId: number, regUser: { userId: number; login: string }) {
-      await this.prismaService.task.update({
-        where: { id: taskId },
-        data: { deleted: true },
-      });
+  async deleteTask(taskId: number, regUser: { userId: number; login: string }) {
+    await this.prismaService.task.update({
+      where: { id: taskId },
+      data: { deleted: true },
+    });
 
-      await this.prismaService.taskChange.create({
-        data: {
-          taskId,
-          userId: regUser.userId,
-          event: 'DELETED',
-        },
-      });
-    }
+    await this.prismaService.taskChange.create({
+      data: {
+        taskId,
+        userId: regUser.userId,
+        event: 'DELETED',
+      },
+    });
+  }
 
-    async changeTaskStatus(taskId: number, status: 'CURRENT' | 'POSTPONED' | 'COMPLETED', regUser: { userId: number; login: string },) {
-      await this.prismaService.task.update({
-        where: { id: taskId },
-        data: { status },
-      });
+  async changeTaskStatus(
+    taskId: number,
+    status: 'CURRENT' | 'POSTPONED' | 'COMPLETED',
+    regUser: { userId: number; login: string },
+  ) {
+    await this.prismaService.task.update({
+      where: { id: taskId },
+      data: { status },
+    });
 
-      await this.prismaService.taskChange.create({
-        data: {
-          taskId,
-          userId: regUser.userId,
-          event: 'UPDATED',
-        },
-      });
-    }
+    await this.prismaService.taskChange.create({
+      data: {
+        taskId,
+        userId: regUser.userId,
+        event: 'UPDATED',
+      },
+    });
+  }
 
-    async getTasksByStatus(status: 'CURRENT' | 'POSTPONED' | 'COMPLETED') {
-      return await this.prismaService.task.findMany({
-        where: {
-          status,
-          deleted: false,
-        },
-        include: {
-          assignedTo: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
-    }
+  async getTasksByStatus(status: 'CURRENT' | 'POSTPONED' | 'COMPLETED') {
+    return await this.prismaService.task.findMany({
+      where: {
+        status,
+        deleted: false,
+      },
+      include: {
+        assignedTo: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+  async getAllTasks() {
+    return await this.prismaService.task.findMany({
+      where: {
+        deleted: false,
+      },
+      include: {
+        assignedTo: true,
+        createdBy: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 
-    async getTaskHistory(taskId: number) {
-      return await this.prismaService.taskChange.findMany({
-        where: { taskId },
-        include: {
-          user: true,
-        },
-        orderBy: {
-          date: 'desc',
-        },
-      });
-    }
+  async getTaskHistory(taskId: number) {
+    return await this.prismaService.taskChange.findMany({
+      where: { taskId },
+      include: {
+        user: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+  }
 
-    async searchTasks(query: {
-      title?: string
-      createdAt?: Date
-      assignedToId?: number
-    }) {
-      return await this.prismaService.task.findMany({
-        where: {
-          title: query.title ? { contains: query.title } : undefined,
-          createdAt: query.createdAt ? { gte: query.createdAt } : undefined,
-          assignedToId: query.assignedToId,
-          deleted: false,
-        },
-      });
-    }
+  async searchTasks(query: {
+    title?: string;
+    createdAt?: Date;
+    assignedToId?: number;
+  }) {
+    return await this.prismaService.task.findMany({
+      where: {
+        title: query.title ? { contains: query.title } : undefined,
+        createdAt: query.createdAt ? { gte: query.createdAt } : undefined,
+        assignedToId: query.assignedToId,
+        deleted: false,
+      },
+    });
+  }
 }
