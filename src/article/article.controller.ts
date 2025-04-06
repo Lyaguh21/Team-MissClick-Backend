@@ -3,50 +3,53 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
+  Query,
   UseGuards,
   Request,
+  Patch,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create.dto';
-import { UpdateDto } from './dto/updated.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateDto } from './dto/updated.dto';
 
 @Controller()
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/viewAll')
+  @Get('/viewAll')
   async viewAll(
     @Request() req,
-    @Body('sortBy') sortBy?: 'createdAt' | 'title',
-    @Body('order') order?: 'asc' | 'desc',
-  ) {
-    return this.articleService.viewAll(sortBy, order, req.user);
+    @Query('sortBy') sortBy?: 'createdAt' | 'title',
+    @Query('order') order?: 'asc' | 'desc',
+    ) {   
+    return this.articleService.viewAll(sortBy, order, req);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/create')
   async createArticle(@Body() dto: CreateArticleDto, @Request() req) {
+
     return this.articleService.createArticle(dto, req.user);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('/delete')
-  async deleteArticle(@Body('id') articleId: number, @Request() req) {
-    return this.articleService.deleteArcticle(articleId, req.user);
+  @Patch("/delete")
+  deleteArticle(@Body("id", ParseIntPipe) arcticleId: number, @Request() req ){
+    return this.articleService.deleteArcticle(arcticleId, req)
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/history')
-  async getArticleHistory(@Body('id') id: number) {
-    return this.articleService.getArticleHistory(id);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('/update')
-  async updateArticle(@Body() dto: UpdateDto, @Request() req) {
+  @Patch("/update")
+   async updateArticle(@Body() dto: UpdateDto, @Request() req) {
     return this.articleService.updateArticle(dto, req.user);
-  }
+   }
+
+   @UseGuards(AuthGuard('jwt'))
+   @Get('/history')
+   async getArticleHistory(@Body('id', ParseIntPipe) id: number) {
+     return this.articleService.getArticleHistory(id);
+   }
 }
