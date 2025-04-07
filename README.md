@@ -73,18 +73,19 @@ JWT_SECRET=super-secret-key
 JWT_EXPIRES_IN=1d
 ```
 #
-##### Настраиваете prisma:
-
-```bash
-npx prisma generate
-```
-#
-##### Открываете репозиторий через докер
+##### Создание контейнера базы даныых:
 
 ```bash
 docker compose up -d      
 ````
 #
+##### Настраиваете prisma:
+
+```bash
+npx prisma migrate dev
+```
+#
+
 ##### Запускаете backend репозиторий
 
 ```bash
