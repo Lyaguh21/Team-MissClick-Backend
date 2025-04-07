@@ -82,7 +82,7 @@ docker compose up -d
 ##### Настраиваете prisma:
 
 ```bash
-npx prisma migrate dev
+npx prisma db push
 ```
 #
 
